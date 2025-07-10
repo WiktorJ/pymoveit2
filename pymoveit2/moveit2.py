@@ -523,8 +523,9 @@ class MoveIt2:
         if future is None:
             return None
 
-        while not future.done():
-            rclpy.spin_once(self._node, timeout_sec=1.0)
+        rate = self._node.create_rate(10)
+        while rclpy.ok() and not future.done():
+            rate.sleep()
 
         return self.get_trajectory(
             future,
@@ -630,13 +631,14 @@ class MoveIt2:
                 weight=weight_joint_position,
             )
         # Define starting state for the plan (default to the current state)
-        while start_joint_state is None:
+        rate = self._node.create_rate(10)
+        while rclpy.ok() and start_joint_state is None:
             self._node._logger.warn(message="Joint states are not available yet!")
             if self.__joint_state is not None:
                 start_joint_state = self.__joint_state
                 break
             else:
-                rclpy.spin_once(self._node, timeout_sec=1.0)
+                rate.sleep()
         self._node._logger.info(message="Joint states are available now")
 
         # Plan trajectory asynchronously by service call
@@ -743,8 +745,9 @@ class MoveIt2:
             )
             return False
 
-        while self.__is_motion_requested or self.__is_executing:
-            rclpy.spin_once(self._node, timeout_sec=1.0)
+        rate = self._node.create_rate(10)
+        while rclpy.ok() and (self.__is_motion_requested or self.__is_executing):
+            rate.sleep()
 
         return self.motion_suceeded
 
@@ -1185,8 +1188,9 @@ class MoveIt2:
         if future is None:
             return None
 
-        while not future.done():
-            rclpy.spin_once(self._node, timeout_sec=1.0)
+        rate = self._node.create_rate(10)
+        while rclpy.ok() and not future.done():
+            rate.sleep()
 
         return self.get_compute_fk_result(future, fk_link_names=fk_link_names)
 
@@ -1277,8 +1281,9 @@ class MoveIt2:
         if future is None:
             return None
 
-        while not future.done():
-            rclpy.spin_once(self._node, timeout_sec=1.0)
+        rate = self._node.create_rate(10)
+        while rclpy.ok() and not future.done():
+            rate.sleep()
 
         return self.get_compute_ik_result(future)
 
@@ -1957,9 +1962,7 @@ class MoveIt2:
         )
 
         stamp = self._node.get_clock().now().to_msg()
-        self.__kinematic_path_request.motion_plan_request.workspace_parameters.header.stamp = (
-            stamp
-        )
+        self.__kinematic_path_request.motion_plan_request.workspace_parameters.header.stamp = stamp
         for (
             constraints
         ) in self.__kinematic_path_request.motion_plan_request.goal_constraints:
