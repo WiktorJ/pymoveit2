@@ -1,7 +1,7 @@
 import copy
 import threading
 from enum import Enum
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Callable, List, Optional, Tuple, Union
 
 import numpy as np
 import rclpy
@@ -348,7 +348,7 @@ class MoveIt2:
         weight_orientation: float = 1.0,
         cartesian_max_step: float = 0.0025,
         cartesian_fraction_threshold: float = 0.0,
-        feedback_callback: Optional[callable] = None,
+        feedback_callback: Optional[Callable] = None,
     ):
         """
         Plan and execute motion based on previously set goals. Optional arguments can be
@@ -445,7 +445,7 @@ class MoveIt2:
         joint_names: Optional[List[str]] = None,
         tolerance: float = 0.001,
         weight: float = 1.0,
-        feedback_callback: Optional[callable] = None,
+        feedback_callback: Optional[Callable] = None,
     ):
         """
         Plan and execute motion based on previously set goals. Optional arguments can be
@@ -713,7 +713,7 @@ class MoveIt2:
             )
             return None
 
-    def execute(self, joint_trajectory: JointTrajectory, feedback_callback: Optional[callable] = None):
+    def execute(self, joint_trajectory: JointTrajectory, feedback_callback: Optional[Callable] = None):
         """
         Execute joint_trajectory by communicating directly with the controller.
         """
@@ -2056,7 +2056,7 @@ class MoveIt2:
             self.__cartesian_path_request
         )
 
-    def _send_goal_async_move_action(self, feedback_callback: Optional[callable] = None):
+    def _send_goal_async_move_action(self, feedback_callback: Optional[Callable] = None):
         self.__execution_mutex.acquire()
         stamp = self._node.get_clock().now().to_msg()
         self.__move_action_goal.request.workspace_parameters.header.stamp = stamp
@@ -2118,7 +2118,7 @@ class MoveIt2:
     def _send_goal_async_execute_trajectory(
         self,
         goal: ExecuteTrajectory,
-        feedback_callback: Optional[callable] = None,
+        feedback_callback: Optional[Callable] = None,
     ):
         self.__execution_mutex.acquire()
 
